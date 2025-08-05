@@ -1,0 +1,6 @@
+pandas
+streamlit
+spacy
+scikit-learn
+numpy
+regex
