@@ -17,7 +17,7 @@ def load_data():
 
 movies = load_data()
 
-st.title("🎬 CineQuery: Ask About Movies")
+st.title("🎬 CinemaGPT: Ask About Movies")
 user_input = st.text_input("Ask me something about movies!", placeholder="e.g. Top 5 thrillers since 2010")
 
 if user_input:
