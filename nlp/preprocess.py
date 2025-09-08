@@ -7,7 +7,7 @@ import nltk
 # nltk.download('stopwords')
 
 # Load SpaCy English model
-# nlp = spacy.load("en_core_web_sm")
+nlp = spacy.load("en_core_web_sm")
 
 # Tokenize the input text (list of individual words)
 def tokenize(text):
@@ -28,20 +28,32 @@ def remove_stopwords(tokens):
     return [t for t in tokens if t not in stop_words]
 
 def lemmatize(tokens):
-    pass
+    text = " ".join(tokens)
+    doc = nlp(text)
+    return [token.lemma_ for token in doc]
 
 def clean_text(text):
-    pass
+    return lemmatize(
+        remove_stopwords(
+            remove_punctuation(
+                lowercase(
+                    tokenize(text)))))
 
 #---------- TESTING ----------#
 if __name__ == "__main__":
     print("\n\n|---------- TESING ----------|\n\n")
 
-    tokens = tokenize("NLTK is a powerful library for natural language processing.")
-    print(tokens)
-    tokens = lowercase(tokens)
-    print(tokens)
-    tokens = remove_punctuation(tokens)
-    print(tokens)
-    tokens = remove_stopwords(tokens)
-    print(tokens)
+    # raw_text = "NLTK is a powerful library for natural language processing."
+    raw_text = "The children were running through the fields while their parents watched."
+    # tokens = tokenize(raw_text)
+    # print(tokens)
+    # tokens = lowercase(tokens)
+    # print(tokens)
+    # tokens = remove_punctuation(tokens)
+    # print(tokens)
+    # tokens = remove_stopwords(tokens)
+    # print(tokens)
+    # tokens = lemmatize(tokens)
+    # print(tokens)
+    print(raw_text)
+    print(clean_text(raw_text))
