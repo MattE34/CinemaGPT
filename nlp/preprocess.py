@@ -53,6 +53,7 @@ if __name__ == "__main__":
     print("\n\n|---------- TESING ----------|\n\n")
 
     # raw_text = "NLTK is a powerful library for natural language processing."
-    raw_text = "The children were running through the fields while their parents watched."
+    # raw_text = "The children were running through the fields while their parents watched."
+    raw_text = "Top sci-fi movies shot by greg fraiser or directed by Christopher Nolan."
     print(raw_text)
     print(clean_text(raw_text))
