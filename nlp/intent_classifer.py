@@ -11,16 +11,17 @@ RANK_KEYWORDS = {"top", "best", "most", "greatest", "highest"}
 
 # ----- Metrics ----- #
 METRIC_KEYWORDS = {
-    "rating": ["rated", "rating", "score"],
+    "rating": ["rated", "rating", "score", "rate"],
     "popularity": ["popular", "popularity", "famous"],
-    "revenue": ["grossing", "revenue", "earned", "box office"],
-    "vote_count": ["voted", "votes"]
+    "revenue": ["grossing", "gross", "revenue", "earned", "earning", "earn", "box office"],
+    "vote_count": ["voted", "votes", "vote"]
 }
 
 # ----- Numbers ----- #
 NUMBER_WORDS = {
     "one": 1, "two": 2, "three": 3, "four": 4, "five": 5,
-    "six": 6, "seven": 7, "eight": 8, "nine": 9, "ten": 10
+    "six": 6, "seven": 7, "eight": 8, "nine": 9, "ten": 10,
+    "eleven": 11, "twelve": 12, "thirteen": 13, "fourteen": 14, "fifteen": 15
 }
 
 # ------------------------------------------------------- #
@@ -29,11 +30,21 @@ NUMBER_WORDS = {
 
 # Extract numeric value (top 5, top 10) and default to 5 if not listed
 def extract_top_n(tokens):
-    pass
+    for i, token in enumerate(tokens):
+        if token == "top" and i + 1 < len(tokens):
+            next_token = tokens[i + 1]
+            if next_token.isdigit():
+                return int(next_token)
+            elif next_token in NUMBER_WORDS:
+                return NUMBER_WORDS[next_token]
+    return 5  # default
 
 # Detect metric to sort by (rating, popularity, earnings)
 def detect_metric(tokens):
-    pass
+    for metric, keywords in METRIC_KEYWORDS.items():
+        if any(token in keywords for token in tokens):
+            return metric
+    return "rating"  # default fallback
 
 # ------------------------------------------------------------------ #
 # ------------------ MAIN CLASSIFICATION FUNCTION ------------------ #
