@@ -7,7 +7,7 @@ from preprocess import clean_text
 # ---------------------------------------------------------------------- #
 
 # ----- Rankings ----- #
-RANK_KEYWORDS = {"top", "best", "most", "greatest", "great", "highest", "high", "popular", "expensive", "pay"}
+RANK_KEYWORDS = {"top", "best", "most", "greatest", "great", "highest", "high", "popular", "expensive", "pay", "vote"}
 
 # ----- Metrics ----- #
 METRIC_KEYWORDS = {
@@ -99,7 +99,8 @@ if __name__ == "__main__":
         "twelve films directed by Matt Reeves and shot by Greg Fraiser",
         "list 3 sci-fi films composed by hans zimmer",
         "highest paid actors in 2010",
-        "list the 5 most expensive movies"
+        "list the 5 most expensive movies",
+        "list the most voted movies"
     ]
 
     for query in queries:
