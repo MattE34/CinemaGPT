@@ -7,13 +7,14 @@ from preprocess import clean_text
 # ---------------------------------------------------------------------- #
 
 # ----- Rankings ----- #
-RANK_KEYWORDS = {"top", "best", "most", "greatest", "highest"}
+RANK_KEYWORDS = {"top", "best", "most", "greatest", "great", "highest", "high", "popular", "expensive", "pay"}
 
 # ----- Metrics ----- #
 METRIC_KEYWORDS = {
     "rating": ["rated", "rating", "score", "rate"],
     "popularity": ["popular", "popularity", "famous"],
-    "revenue": ["grossing", "gross", "revenue", "earned", "earning", "earn", "box office"],
+    "revenue": ["grossing", "gross", "revenue", "earned", "earning", "earn", "box office", "paying", "paid", "pay"],
+    "budget": ["expensive", "expense", "cost", "costing"],
     "vote_count": ["voted", "votes", "vote"]
 }
 
@@ -31,7 +32,14 @@ NUMBER_WORDS = {
 # Extract numeric value (top 5, top 10) and default to 5 if not listed
 def extract_top_n(tokens):
     for i, token in enumerate(tokens):
-        if token == "top" and i + 1 < len(tokens):
+        # number listed before "top" or "top" not listed
+        if token.isdigit():
+            if int(token) < 1000:
+                return int(token)
+        elif token in NUMBER_WORDS:
+            return NUMBER_WORDS[token]
+        # number listed after "top"
+        elif token == "top" and i + 1 < len(tokens):
             next_token = tokens[i + 1]
             if next_token.isdigit():
                 return int(next_token)
@@ -39,12 +47,22 @@ def extract_top_n(tokens):
                 return NUMBER_WORDS[next_token]
     return 5  # default
 
+# Extract numeric value (5, 10) and default to -1 (no limit) if not listed
+def extract_n(tokens):
+    for i, token in enumerate(tokens):
+        if token.isdigit():
+            if int(token) < 1000:
+                return int(token)
+        elif token in NUMBER_WORDS:
+            return NUMBER_WORDS[token]
+    return -1  # default
+
 # Detect metric to sort by (rating, popularity, earnings)
 def detect_metric(tokens):
     for metric, keywords in METRIC_KEYWORDS.items():
         if any(token in keywords for token in tokens):
             return metric
-    return "rating"  # default fallback
+    return "rating"  # default
 
 # ------------------------------------------------------------------ #
 # ------------------ MAIN CLASSIFICATION FUNCTION ------------------ #
@@ -52,21 +70,36 @@ def detect_metric(tokens):
 
 # From list of prepreocessed tokens, determine intent and key query structure
 def classify_intent(tokens):
-    pass
+    intent = defaultdict()
+
+    # 1. Ranking-based query
+    if any(token in RANK_KEYWORDS for token in tokens):
+        intent["type"] = "top_n"
+        intent["n"] = extract_top_n(tokens)
+        intent["metric"] = detect_metric(tokens)
+    # 2. Non-ranking based query
+    else:
+        intent["type"] = "filter_only"
+        intent["n"] = extract_n(tokens)
+
+    # Detect more intent types later (e.g., "question" vs "list")
+
+    return intent
 
 # --------------------------------------------- #
 # ------------------ TESTING ------------------ #
 # --------------------------------------------- #
 
 if __name__ == "__main__":
-    print("\n|---------- TESING ----------|\n")
+    print("\n|---------- TESING ----------|")
     queries = [
         "top rated japanese films",
-        "top 5 films starring Brad Pitt",
+        "8 top grossing films starring Brad Pitt",
         "most popular WB films",
-        "films directed by Matt Reeves and shot by Greg Fraiser",
-        "sci-fi films composed by hans zimmer",
-        "highest grossing action films in 2010"
+        "twelve films directed by Matt Reeves and shot by Greg Fraiser",
+        "list 3 sci-fi films composed by hans zimmer",
+        "highest paid actors in 2010",
+        "list the 5 most expensive movies"
     ]
 
     for query in queries:
