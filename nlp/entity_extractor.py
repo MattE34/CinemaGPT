@@ -1,6 +1,8 @@
 import os
+import time
 import spacy
 from spacy.pipeline import EntityRuler
+from spacy.matcher import PhraseMatcher
 from collections import defaultdict
 import re
 import pandas as pd
@@ -15,8 +17,30 @@ import json
 # nlp = spacy.load("en_core_web_sm")
 # ruler = nlp.add_pipe("entity_ruler", before="ner")
 
-# Load prebuilt pipeline (saved locally)
-nlp = spacy.load("nlp_with_entities")
+# # Load prebuilt pipeline (saved locally)
+# nlp = spacy.load("nlp_with_entities")
+
+# ----- Global cache for nlp ----- #
+_nlp = None
+  
+def get_nlp():
+    # global _nlp
+    # if _nlp is None:
+    #     print("Loading NLP pipeline with entities...")
+    #     _nlp = spacy.load("nlp_with_entities")  # takes ~90s the first time
+    #     print("NLP pipeline loaded.")
+    # return _nlp
+    global _nlp
+    if _nlp is None:
+        start = time.time()
+        print("Loading minimal NLP pipeline with EntityRuler only...")
+        _nlp = spacy.blank("en")
+        ruler = _nlp.add_pipe("entity_ruler")
+        with open("entity_patterns.jsonl", "r", encoding="utf8") as f:
+            loaded_patterns = [json.loads(line.strip()) for line in f]
+        ruler.add_patterns(loaded_patterns)
+        print("NLP pipelined loaded in", round(time.time() - start, 2), "seconds\n")
+    return _nlp
 
 # # ----- Load datasets ----- #
 # movies = pd.read_csv("../data/tmdb_5000_movies.csv")
@@ -162,21 +186,6 @@ ROLE_SYNONYMS = {
 
 # ----- Add to pipeline ----- #
 
-# # Cache Check (didn't optimize)
-# pattern_path = "entity_patterns.jsonl"
-# if os.path.exists(pattern_path):
-#     print("[INFO] Loading cached entity patterns...")
-#     with open(pattern_path, "r", encoding="utf8") as f:
-#         loaded_patterns = [json.loads(line.strip()) for line in f]
-#     ruler = nlp.add_pipe("entity_ruler", before="ner")
-#     ruler.add_patterns(loaded_patterns)
-# else:
-#     print("[INFO] Building and saving entity patterns...")
-#     # ... your current pattern-building code ...
-#     with open(pattern_path, "w", encoding="utf8") as f:
-#         for pattern in patterns:
-#             f.write(json.dumps(pattern) + "\n")
-
 # # Reading and adding patterns from local json file
 # with open("entity_patterns.jsonl", "r", encoding="utf8") as f:
 #     loaded_patterns = [json.loads(line.strip()) for line in f]
@@ -193,16 +202,8 @@ ROLE_SYNONYMS = {
 
 # Extract different entities (person, genre, title, year, etc.) from the tokens
 def extract_entities(text):
-    
-    # text = " ".join(tokens)
-    # print(f"CLEANED TEXT:\n{text}")
 
-    # doc = nlp(text)
-    # entites = defaultdict(list)
-
-    # # temporary
-    # return doc.ents
-
+    nlp = get_nlp()
     doc = nlp(text.lower())
     extracted = defaultdict(list)
     for ent in doc.ents:
@@ -215,13 +216,8 @@ def extract_entities(text):
 
 if __name__ == "__main__":
     print("\n|---------- TESING ----------|\n")
-    # raw_text = "Show me the best science-fiction movies with Brad Pitt from 1999 or 2000 or Avatar or Star War or After Hours"
-    # entities = extract_entities(raw_text)
-    # for ent in entities:
-    #     print(f"Entity: {ent.text}, Type: {ent.label_}")
-    
     # text = "Show me the best science-fiction movies with Brad Pitt from 1999 or 2000 or Avatar or Star Wars, directed by Christopher Nolan and shot by Wally Pfister and scored by Hans Zimmer"
-    text = "Show me all French horror films produced by WB or Paramount Pictures"
+    text = "Show me all French horror films produced by WB or Paramount Pictures or Fox starring Brad Pitt"
     entities = extract_entities(text)
     for label, items in entities.items():
         print(f"{label}: {set(items)}")
