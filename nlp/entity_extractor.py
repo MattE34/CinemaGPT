@@ -11,9 +11,12 @@ import json
 # ------------------ LOADING ASSETS ------------------ #
 # ---------------------------------------------------- #
 
-# Load SpaCy English model and EntityExtractor
-nlp = spacy.load("en_core_web_sm")
-ruler = nlp.add_pipe("entity_ruler", before="ner")
+# # Load SpaCy English model and EntityExtractor
+# nlp = spacy.load("en_core_web_sm")
+# ruler = nlp.add_pipe("entity_ruler", before="ner")
+
+# Load prebuilt pipeline (saved locally)
+nlp = spacy.load("nlp_with_entities")
 
 # # ----- Load datasets ----- #
 # movies = pd.read_csv("../data/tmdb_5000_movies.csv")
@@ -159,8 +162,8 @@ ROLE_SYNONYMS = {
 
 # ----- Add to pipeline ----- #
 
-pattern_path = "entity_patterns.jsonl"
-
+# # Cache Check (didn't optimize)
+# pattern_path = "entity_patterns.jsonl"
 # if os.path.exists(pattern_path):
 #     print("[INFO] Loading cached entity patterns...")
 #     with open(pattern_path, "r", encoding="utf8") as f:
@@ -174,11 +177,15 @@ pattern_path = "entity_patterns.jsonl"
 #         for pattern in patterns:
 #             f.write(json.dumps(pattern) + "\n")
 
-with open("entity_patterns.jsonl", "r", encoding="utf8") as f:
-    loaded_patterns = [json.loads(line.strip()) for line in f]
+# # Reading and adding patterns from local json file
+# with open("entity_patterns.jsonl", "r", encoding="utf8") as f:
+#     loaded_patterns = [json.loads(line.strip()) for line in f]
 
-ruler.add_patterns(loaded_patterns)
-# ruler.add_patterns(patterns)
+# ruler.add_patterns(loaded_patterns)
+# # ruler.add_patterns(patterns)
+
+# # ----- Save the full pipeline locally (serialize) ----- #
+# nlp.to_disk("nlp_with_entities")
 
 # --------------------------------------------------------------- #
 # ------------------ EXTRACT ENTITIES FUNCTION ------------------ #
