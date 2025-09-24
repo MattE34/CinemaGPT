@@ -25,6 +25,18 @@ NUMBER_WORDS = {
     "eleven": 11, "twelve": 12, "thirteen": 13, "fourteen": 14, "fifteen": 15
 }
 
+# ----- Questions ----- #
+QUESTION_KEYWORDS = {"who", "when"}
+
+# ----- Quantities ----- #
+QUANTITY_KEYWORDS = {"how", "many", "count", "number", "frequency"}
+
+# ----- Lists ----- #
+LIST_KEYWORDS = {
+    "what", "list", "show", "all", "give", "fetch", "display", "identify",
+    "film", "movie", "direct", "actor", "actress", "produce", "write", "compose", "score"
+}
+
 # ------------------------------------------------------- #
 # ------------------ UTILITY FUNCTIONS ------------------ #
 # ------------------------------------------------------- #
@@ -77,12 +89,23 @@ def classify_intent(tokens):
         intent["type"] = "top_n"
         intent["n"] = extract_top_n(tokens)
         intent["metric"] = detect_metric(tokens)
-    # 2. Non-ranking based query
-    else:
-        intent["type"] = "filter_only"
-        intent["n"] = extract_n(tokens)
+    
+    # 2. Question query
+    elif any(token in QUESTION_KEYWORDS for token in tokens):
+        intent["type"] = "question"
+    
+    # 3. Quantity query
+    elif any(token in QUANTITY_KEYWORDS for token in tokens):
+        intent["type"] = "quantity"
 
-    # Detect more intent types later (e.g., "question" vs "list")
+    # 4. List query
+    elif any(token in LIST_KEYWORDS for token in tokens):
+        intent["type"] = "list"
+        intent["n"] = extract_n(tokens)
+        
+    # Unrecognizable query
+    else:
+        print("Don't recognize request")
 
     return intent
 
@@ -100,7 +123,13 @@ if __name__ == "__main__":
         "list 3 sci-fi films composed by hans zimmer",
         "highest paid actors in 2010",
         "list the 5 most expensive movies",
-        "list the most voted movies"
+        "show me christopher nolan films",
+        "list the most voted movies",
+        "who directed The Dark Knight?",
+        "How many movies did Wes Anderson direct?",
+        "21 action movies"
+        # testing which words are ignored from preprocessing
+        # "list display fetch give show me all identify tell me who what when how many number of count"
     ]
 
     for query in queries:

@@ -12,7 +12,9 @@ import spacy
 nlp = spacy.load("en_core_web_sm")
 
 # Load list of stop words
-stop_words = set(stopwords.words('english'))
+INTENT_KEYWORDS = {"who", "what", "when", "where", "why", "how", "how many", "number", "count", "all"}
+stop_words = set(stopwords.words('english')) - INTENT_KEYWORDS
+# stop_words = set(stopwords.words('english'))
 
 #---------- FUNCTIONS ----------#
 
