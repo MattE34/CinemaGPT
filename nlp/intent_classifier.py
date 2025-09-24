@@ -102,10 +102,10 @@ def classify_intent(tokens):
     elif any(token in LIST_KEYWORDS for token in tokens):
         intent["type"] = "list"
         intent["n"] = extract_n(tokens)
-        
+
     # Unrecognizable query
     else:
-        print("Don't recognize request")
+        intent["type"] = "unknown"
 
     return intent
 
@@ -127,7 +127,8 @@ if __name__ == "__main__":
         "list the most voted movies",
         "who directed The Dark Knight?",
         "How many movies did Wes Anderson direct?",
-        "21 action movies"
+        "21 action movies",
+        "apple bacon food"
         # testing which words are ignored from preprocessing
         # "list display fetch give show me all identify tell me who what when how many number of count"
     ]
