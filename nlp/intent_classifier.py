@@ -9,8 +9,8 @@ from preprocess import clean_text
 # ----- Rankings ----- #
 RANK_KEYWORDS = {"top", "best", "most", "greatest", "great", "highest", "high", "popular", "expensive", "pay", "vote"}
 
-# ----- Metrics ----- #
-METRIC_KEYWORDS = {
+# ----- Rank Metrics ----- #
+RANK_METRIC_KEYWORDS = {
     "rating": ["rated", "rating", "score", "rate"],
     "popularity": ["popular", "popularity", "famous"],
     "revenue": ["grossing", "gross", "revenue", "earned", "earning", "earn", "box office", "paying", "paid", "pay"],
@@ -29,7 +29,16 @@ NUMBER_WORDS = {
 QUESTION_KEYWORDS = {"who", "when"}
 
 # ----- Quantities ----- #
-QUANTITY_KEYWORDS = {"how", "many", "count", "number", "frequency"}
+QUANTITY_KEYWORDS = {"how", "much", "score", "rating", "average", "many", "count", "number", "frequency"}
+
+# ----- Quantity Metrics ----- #
+QUANTITY_METRIC_KEYWORDS = {
+    "rating": ["rated", "rating", "score", "rate", "average"],
+    "revenue": ["grossing", "gross", "revenue", "earned", "earning", "earn", "box office", "make", "paying", "paid", "pay"],
+    "budget": ["expensive", "expense", "cost", "costing"],
+    "vote_count": ["voted", "votes", "vote"],
+    "movie": ["direct", "produce", "write", "score", "compose", "shoot" "act", "star", "feature"]
+}
 
 # ----- Lists ----- #
 LIST_KEYWORDS = {
@@ -70,8 +79,15 @@ def extract_n(tokens):
     return -1  # default
 
 # Detect metric to sort by (rating, popularity, earnings)
-def detect_metric(tokens):
-    for metric, keywords in METRIC_KEYWORDS.items():
+def detect_rank_metric(tokens):
+    for metric, keywords in RANK_METRIC_KEYWORDS.items():
+        if any(token in keywords for token in tokens):
+            return metric
+    return "rating"  # default
+
+# Detect metric to return (rating, earning, movies)
+def detect_quantity_metric(tokens):
+    for metric, keywords in QUANTITY_METRIC_KEYWORDS.items():
         if any(token in keywords for token in tokens):
             return metric
     return "rating"  # default
@@ -85,10 +101,10 @@ def classify_intent(tokens):
     intent = defaultdict()
 
     # 1. Ranking-based query
-    if any(token in RANK_KEYWORDS for token in tokens):
+    if any(token in RANK_KEYWORDS for token in tokens) and not any(token in QUANTITY_KEYWORDS for token in tokens):
         intent["type"] = "top_n"
         intent["n"] = extract_top_n(tokens)
-        intent["metric"] = detect_metric(tokens)
+        intent["metric"] = detect_rank_metric(tokens)
     
     # 2. Question query
     elif any(token in QUESTION_KEYWORDS for token in tokens):
@@ -97,6 +113,7 @@ def classify_intent(tokens):
     # 3. Quantity query
     elif any(token in QUANTITY_KEYWORDS for token in tokens):
         intent["type"] = "quantity"
+        intent["metric"] = detect_quantity_metric(tokens)
 
     # 4. List query
     elif any(token in LIST_KEYWORDS for token in tokens):
@@ -124,11 +141,15 @@ if __name__ == "__main__":
         "highest paid actors in 2010",
         "list the 5 most expensive movies",
         "show me christopher nolan films",
-        "list the most voted movies",
+        "what the most voted movies",
         "who directed The Dark Knight?",
         "How many movies did Wes Anderson direct?",
         "21 action movies",
-        "apple bacon food"
+        "apple bacon food",
+        "what is the average rating for The Dark Knight?",
+        "How much money did The Batman make?",
+        "How much did Avengers cost?",
+        "How many votes did Avatar get?"
         # testing which words are ignored from preprocessing
         # "list display fetch give show me all identify tell me who what when how many number of count"
     ]

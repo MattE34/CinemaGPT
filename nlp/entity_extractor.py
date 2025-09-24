@@ -163,12 +163,12 @@ patterns = []
 
 # ----- Roles ----- #
 ROLE_SYNONYMS = {
-"DIRECTOR": ["director", "directed"],
-"WRITER": ["writer", "written", "screenwriter"],
-"PRODUCER": ["producer", "produced"],
-"COMPOSER": ["composer", "composed", "scored", "score"],
-"CINEMATOGRAPHER": ["cinematographer", "shot", "shot by"],
-"ACTOR": ["actor", "actress", "acted", "cast", "starring", "starred", "featuring", "featuring actor", "with"]
+"DIRECTOR": ["director", "directed"], # might have to add "direct"
+"WRITER": ["writer", "written", "screenwriter"], # might have to add "write"
+"PRODUCER": ["producer", "produced"], # might have to add "produce"
+"COMPOSER": ["composer", "composed", "scored", "score"], # might have to add "compose"
+"CINEMATOGRAPHER": ["cinematographer", "shot", "shot by"], # might have to add "shoot"
+"ACTOR": ["actor", "actress", "acted", "cast", "starring", "starred", "featuring", "featuring actor", "with"] # might have to add "act", "casted", "star", "feature"
 }
 
 # for role, terms in ROLE_SYNONYMS.items():
@@ -217,7 +217,11 @@ def extract_entities(text):
 if __name__ == "__main__":
     print("\n|---------- TESING ----------|\n")
     # text = "Show me the best science-fiction movies with Brad Pitt from 1999 or 2000 or Avatar or Star Wars, directed by Christopher Nolan and shot by Wally Pfister and scored by Hans Zimmer"
-    text = "Show me all French horror films produced by WB or Paramount Pictures or Fox starring Brad Pitt"
+    text = "Show me all Paramount French horror films directed by Brad Pitt and starring Matt Reeves"
     entities = extract_entities(text)
     for label, items in entities.items():
-        print(f"{label}: {set(items)}")
+        print(f"{label}: {items}")
+    # labels = list(entities.keys())
+    # items = list(entities.values())
+    # print(labels)
+    # print(items)
