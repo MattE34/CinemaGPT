@@ -1,0 +1,5 @@
+Things to work on:
+- Match production companies to all variations (e.g., WB might also have WB Home Entertainment, WB Classics, etc.)
+- fix searching for films after a certain year
+- fix certain movie titles that produce multiple title results
+- add formatting to revenue and cost

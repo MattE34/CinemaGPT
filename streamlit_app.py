@@ -107,9 +107,9 @@ with st.form(key="query_form", clear_on_submit=False):
     submitted = st.form_submit_button("Search")  # pressing Enter also submits the form
 
 # Optional: a small advanced/debug panel (collapsed by default)
-with st.expander("Advanced (debug)", expanded=False):
-    st.caption("Inspect how your query is parsed. Helpful for debugging entity extraction and intent classification.")
-    st.caption("No personal data is stored; this pane only shows the current query run.")
+# with st.expander("Advanced (debug)", expanded=False):
+#     st.caption("Inspect how your query is parsed. Helpful for debugging entity extraction and intent classification.")
+#     st.caption("No personal data is stored; this pane only shows the current query run.")
 
 # ----------------------
 # Helpers
@@ -162,11 +162,31 @@ if submitted:
             st.info("Type a query above to begin.")
         else:
             # Pipeline: preprocess → intent → entities → role assignment → query → execute
-            tokens = clean_text(text)
-            intent = classify_intent(tokens)
-            entities = extract_entities(text)
-            entities = assign_roles_to_people(entities, text)
-            query = build_query(intent, entities, tokens)
+            with st.status("Searching…", expanded=True) as status:
+                status.write("Preprocessing query…")
+                tokens = clean_text(text)
+
+                status.write("Classifying intent…")
+                intent = classify_intent(tokens)
+
+                status.write("Extracting entities…")
+                entities = extract_entities(text)
+
+                status.write("Assigning roles to people…")
+                entities = assign_roles_to_people(entities, text)
+
+                status.write("Building query…")
+                query = build_query(intent, entities, tokens)
+
+                status.write("Executing query…")
+                result = execute_query(query)
+
+                status.update(label="Done!", state="complete", expanded=False)
+            # tokens = clean_text(text)
+            # intent = classify_intent(tokens)
+            # entities = extract_entities(text)
+            # entities = assign_roles_to_people(entities, text)
+            # query = build_query(intent, entities, tokens)
 
             # Show debug info
             with st.expander("Advanced (debug)", expanded=False):
