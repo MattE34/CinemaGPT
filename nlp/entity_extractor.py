@@ -1,11 +1,11 @@
-import os
+# import os
 import time
 import spacy
-from spacy.pipeline import EntityRuler
-from spacy.matcher import PhraseMatcher
+# from spacy.pipeline import EntityRuler
+# from spacy.matcher import PhraseMatcher
 from collections import defaultdict
-import re
-import pandas as pd
+# import re
+# import pandas as pd
 import json
 # import preprocess # for testing purposes
 
@@ -36,7 +36,7 @@ def get_nlp():
         print("Loading minimal NLP pipeline with EntityRuler only...")
         _nlp = spacy.blank("en")
         ruler = _nlp.add_pipe("entity_ruler")
-        with open("entity_patterns.jsonl", "r", encoding="utf8") as f:
+        with open("nlp/entity_patterns.jsonl", "r", encoding="utf8") as f:
             loaded_patterns = [json.loads(line.strip()) for line in f]
         ruler.add_patterns(loaded_patterns)
         print("NLP pipelined loaded in", round(time.time() - start, 2), "seconds\n")

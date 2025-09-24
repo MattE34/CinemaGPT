@@ -1,7 +1,7 @@
-# from utils import load_data
-from entity_extractor import extract_entities
-from intent_classifier import classify_intent
-from preprocess import clean_text
+from utils.load_data import load_movies_
+from nlp.entity_extractor import extract_entities
+from nlp.intent_classifier import classify_intent
+from nlp.preprocess import clean_text
 import pandas as pd
 import json
 import re
@@ -157,6 +157,13 @@ def build_query(intent, entities, tokens):
 
     return query
 
+# ------------------------------------------------------------ #
+# ------------------ EXECUTE QUERY FUNCTION ------------------ #
+# ------------------------------------------------------------ #
+
+def execute_query(query):
+    pass
+
 # --------------------------------------------- #
 # ------------------ TESTING ------------------ #
 # --------------------------------------------- #
@@ -167,16 +174,32 @@ if __name__ == "__main__":
     # text = "What romance movies did Christopher Nolan produce and Tom Cruise star in?"
     # text = "What is the average rating for Interstellar?"
     # text = "How long is The Dark Knight?"
-    text = "Show me top 10 movies starring Tom Cruise or Robert Pattinson?"
-    tokens = clean_text(text)
-    intent = classify_intent(tokens)
-    print(f"Text: {text}")
-    print(f"Tokens: {tokens}")
-    print(f"Intent: {dict(intent)}\n")
-    entities = extract_entities(text)
-    entities = assign_roles_to_people(entities,text)
-    print("Entities:")
-    for label, items in entities.items():
-        print(f"{label}: {items}")
-    query = build_query(intent,entities,tokens)
-    print(f"\nQuery: {query}")
+    # text = "Show me top 10 movies starring Tom Cruise or Robert Pattinson?"
+    queries = [
+        "Show me all Paramount French horror films starring by Brad Pitt and directed Mattt Reeves",
+        "What romance movies did Christopher Nolan produce and Tom Cruise star in?",
+        "What is the average rating for Interstellar?",
+        "How long is The Dark Knight?",
+        "Show me top 10 movies starring Tom Cruise or Robert Pattinson?"
+    ]
+    for text in queries:
+        tokens = clean_text(text)
+        intent = classify_intent(tokens)
+        entities = extract_entities(text)
+        entities = assign_roles_to_people(entities,text)
+        query = build_query(intent,entities,tokens)
+        print(f"\nText: {text}")
+        print(f"Query: {query}")
+
+    # tokens = clean_text(text)
+    # intent = classify_intent(tokens)
+    # print(f"Text: {text}")
+    # print(f"Tokens: {tokens}")
+    # print(f"Intent: {dict(intent)}\n")
+    # entities = extract_entities(text)
+    # entities = assign_roles_to_people(entities,text)
+    # print("Entities:")
+    # for label, items in entities.items():
+    #     print(f"{label}: {items}")
+    # query = build_query(intent,entities,tokens)
+    # print(f"\nQuery: {query}")

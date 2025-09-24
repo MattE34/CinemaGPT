@@ -1,6 +1,6 @@
-import re
+# import re
 from collections import defaultdict
-from preprocess import clean_text
+from nlp.preprocess import clean_text
 
 # ---------------------------------------------------------------------- #
 # ------------------ MAPPING KEYWORDS TO INTENT TYPES ------------------ #
