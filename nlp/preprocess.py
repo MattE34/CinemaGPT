@@ -2,6 +2,7 @@ from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
 import string
 import spacy
+import time
 
 # import nltk
 
@@ -42,11 +43,14 @@ def lemmatize(tokens):
 
 # Call previous functions to build NLP preprocessing pipeline
 def clean_text(text):
+    start = time.time()
+    print("Preprocessing text...")
     tokens = tokenize(text)
     tokens = lowercase(tokens)
     tokens = remove_punctuation(tokens)
     tokens = remove_stopwords(tokens)
     tokens = lemmatize(tokens)
+    print("Preprocessed text in", round(time.time() - start, 2), "seconds\n")
     return tokens
 
 #---------- TESTING ----------#

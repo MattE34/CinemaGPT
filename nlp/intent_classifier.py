@@ -1,6 +1,7 @@
 # import re
 from collections import defaultdict
 from nlp.preprocess import clean_text
+import time
 
 # ---------------------------------------------------------------------- #
 # ------------------ MAPPING KEYWORDS TO INTENT TYPES ------------------ #
@@ -100,6 +101,8 @@ def detect_quantity_metric(tokens):
 
 # From list of prepreocessed tokens, determine intent and key query structure
 def classify_intent(tokens):
+    start = time.time()
+    print("Classifying intent...")
     intent = defaultdict()
 
     # 1. Ranking-based query
@@ -126,6 +129,7 @@ def classify_intent(tokens):
     else:
         intent["type"] = "unknown"
 
+    print("Classified intent in", round(time.time() - start, 2), "seconds\n")
     return intent
 
 # --------------------------------------------- #
