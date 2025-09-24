@@ -29,15 +29,17 @@ NUMBER_WORDS = {
 QUESTION_KEYWORDS = {"who", "when"}
 
 # ----- Quantities ----- #
-QUANTITY_KEYWORDS = {"how", "much", "score", "rating", "average", "many", "count", "number", "frequency"}
+QUANTITY_KEYWORDS = {"how", "much", "score", "rating", "average", "many", "count", "number", "frequency", "total", "long", "runtime", "run time"}
 
 # ----- Quantity Metrics ----- #
 QUANTITY_METRIC_KEYWORDS = {
     "rating": ["rated", "rating", "score", "rate", "average"],
-    "revenue": ["grossing", "gross", "revenue", "earned", "earning", "earn", "box office", "make", "paying", "paid", "pay"],
+    "revenue": ["grossing", "gross", "revenue", "earned", "earning", "earn", "box office", "make"],
+    "salary": ["paying", "paid", "pay"],
     "budget": ["expensive", "expense", "cost", "costing"],
     "vote_count": ["voted", "votes", "vote"],
-    "movie": ["direct", "produce", "write", "score", "compose", "shoot" "act", "star", "feature"]
+    "movie": ["direct", "produce", "write", "score", "compose", "shoot" "act", "star", "feature"],
+    "runtime": ["length", "long", "runtime", "run time"]
 }
 
 # ----- Lists ----- #

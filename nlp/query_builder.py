@@ -1,6 +1,7 @@
 # from utils import load_data
 from entity_extractor import extract_entities
 from intent_classifier import classify_intent
+from preprocess import clean_text
 import pandas as pd
 import json
 import re
@@ -89,24 +90,93 @@ def assign_roles_to_people(entities, raw_text):
 # ------------------ MAIN QUERY BUILDER FUNCTION ------------------ #
 # ----------------------------------------------------------------- #
 
-def build_query(entities, intent):
+def build_query(intent, entities, tokens):
     # df = load_data.load_movies_()
 
     # Apply filters per entities
-
     # Apply sorting
-
     # Limit results
-    pass
+    
+    query = {
+        "filters": {},
+        "sort_by": None,
+        "limit": None,
+        "return": "movie",  # default return type
+        "type": intent["type"]
+    }
+
+    # 1. Apply filters from extracted entities
+    for key, value in entities.items():
+        key_lower = key.lower()
+
+        if key_lower in {"genre", "language", "date", "production_company"}:
+            query["filters"][key_lower] = value
+
+        elif key_lower == "director":
+            query["filters"]["director"] = value
+        elif key_lower == "producer":
+            query["filters"]["producer"] = value
+        elif key_lower == "actor":
+            query["filters"]["actor"] = value
+        elif key_lower == "writer":
+            query["filters"]["writer"] = value
+        elif key_lower == "composer":
+            query["filters"]["composer"] = value
+        elif key_lower == "cinematographer":
+            query["filters"]["cinematographer"] = value
+        elif key_lower == "movie":
+            query["filters"]["title"] = value
+
+    # 2. Intent-based query handling
+    if intent["type"] == "top_n":
+        query["sort_by"] = intent.get("metric", "rating")
+        query["limit"] = intent.get("n", 5)
+
+    elif intent["type"] == "list":
+        query["limit"] = intent.get("n", -1)  # no limit if not provided
+
+    elif intent["type"] == "quantity":
+        query["return"] = intent.get("metric", "rating")
+
+    elif intent["type"] == "question":
+        # Possible return values: "director", "actor", "composer", etc.
+        if "movie" in entities or "who" in tokens:
+            for role in ["director", "writer", "actor", "composer", "cinematographer"]:
+                if role.upper() in entities:
+                    query["return"] = role
+                    break
+            else:
+                query["return"] = "person"
+        elif "date" in entities or "when" in tokens:
+            query["return"] = "date"
+        else:
+            query["return"] = "unknown"
+
+    elif intent["type"] == "unknown":
+        query["return"] = "unknown"
+
+    return query
 
 # --------------------------------------------- #
 # ------------------ TESTING ------------------ #
 # --------------------------------------------- #
 
 if __name__ == "__main__":
+    print("\n|---------- TESING ----------|\n")
     # text = "Show me all Paramount French horror films starring by Brad Pitt and directed Mattt Reeves"
-    text = "What romance movies did Christopher Nolan produce and Tom Cruise star in?"
+    # text = "What romance movies did Christopher Nolan produce and Tom Cruise star in?"
+    # text = "What is the average rating for Interstellar?"
+    # text = "How long is The Dark Knight?"
+    text = "Show me top 10 movies starring Tom Cruise or Robert Pattinson?"
+    tokens = clean_text(text)
+    intent = classify_intent(tokens)
+    print(f"Text: {text}")
+    print(f"Tokens: {tokens}")
+    print(f"Intent: {dict(intent)}\n")
     entities = extract_entities(text)
     entities = assign_roles_to_people(entities,text)
+    print("Entities:")
     for label, items in entities.items():
         print(f"{label}: {items}")
+    query = build_query(intent,entities,tokens)
+    print(f"\nQuery: {query}")

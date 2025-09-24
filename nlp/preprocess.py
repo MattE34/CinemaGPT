@@ -57,6 +57,7 @@ if __name__ == "__main__":
     # raw_text = "NLTK is a powerful library for natural language processing."
     # raw_text = "The children were running through the fields while their parents watched."
     # raw_text = "Top sci-fi movies shot by greg fraiser or directed by Christopher Nolan."
-    raw_text = "Show me all French horror films produced by WB or Paramount Pictures or Fox starring Brad Pitt"
+    # raw_text = "Show me all French horror films produced by WB or Paramount Pictures or Fox starring Brad Pitt"
+    raw_text = "Who directed The Batman and when was The batman released?"
     print(raw_text)
     print(clean_text(raw_text))
