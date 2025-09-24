@@ -21,12 +21,12 @@ def assign_roles_to_people(entities, raw_text):
 
     # Define role keywords to look for in proximity
     role_keywords = {
-        "DIRECTOR": ["directed", "director", "film by"],
-        "ACTOR": ["starring", "starred", "acted", "featuring", "featuring actors", "with"],
-        "WRITER": ["written", "writer", "screenplay", "screenwriter"],
-        "PRODUCER": ["produced", "producer"],
-        "COMPOSER": ["scored", "composed", "composer", "music by"],
-        "CINEMATOGRAPHER": ["shot by", "cinematography", "cinematographer"],
+        "DIRECTOR": ["directed", "director", "film by", "films by", "direct"],
+        "ACTOR": ["starring", "starred", "star", "acted", "actor", "act", "actress", "cast", "casted", "featuring", "featuring actor", "feature", "with"],
+        "WRITER": ["written", "writer", "write", "screenplay", "screenwriter"],
+        "PRODUCER": ["produced", "producer", "produce"],
+        "COMPOSER": ["scored", "score", "composed", "composer", "compose", "music by"],
+        "CINEMATOGRAPHER": ["shot by", "shot", "shoot", "cinematography", "cinematographer"],
     }
 
     # Normalize text
@@ -59,18 +59,29 @@ def assign_roles_to_people(entities, raw_text):
         if closest_role:
             role_to_people[closest_role].append(person)
 
-    # Add new role-specific people to the entities dict
+    # Add new role-specific people to the entities dict and remove associated role keywords
+
     for role, names in role_to_people.items():
-        if role in entities:
-            entities[role].extend(names)
-        else:
-            entities[role] = names
+        # Remove keyword-only entries if people were assigned
+        entities[role] = [
+            entry for entry in entities.get(role, []) if entry not in role_keywords[role]
+        ] + names
+
+    # for role, names in role_to_people.items():
+    #     if role in entities:
+    #         entities[role].extend(names)
+    #     else:
+    #         entities[role] = names
 
     # Remove them from PERSON so we don’t double-count
     entities["PERSON"] = [
         p for p in entities["PERSON"]
         if all(p not in role_to_people[r] for r in role_to_people)
     ]
+
+    # If all persons were assigned roles, remove empty PERSON key
+    if not entities["PERSON"]:
+        del entities["PERSON"]
 
     return entities
 
@@ -93,7 +104,8 @@ def build_query(entities, intent):
 # --------------------------------------------- #
 
 if __name__ == "__main__":
-    text = "Show me all Paramount French horror films starring by Brad Pitt and directed Matt Reeves"
+    # text = "Show me all Paramount French horror films starring by Brad Pitt and directed Mattt Reeves"
+    text = "What romance movies did Christopher Nolan produce and Tom Cruise star in?"
     entities = extract_entities(text)
     entities = assign_roles_to_people(entities,text)
     for label, items in entities.items():
